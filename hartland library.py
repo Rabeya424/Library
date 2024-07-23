@@ -5,18 +5,22 @@ import platform
 listBooks = [
     {"title": "Rabeya Cooks", "author": "Rabeya Begum", "ISBN": "786786", "copies": 5},
     {"title": "Sahara Cars", "author": "Sahara Rahman", "ISBN": "143143", "copies": 3},
-    {"title": "Mikael Designs", "author": "Mohammed Mikael", "ISBN": "246246", "copies": 7},
+    {"title": "Mikael Designs", "author": " Mikael", "ISBN": "246246", "copies": 7},
     {"title": "Issa Homes", "author": "Mohammed Issa", "ISBN": "139139", "copies": 4}
 ]
 
 # Dictionary to track borrowed books by user
 borrowed_books = {}
 
-# Dictionary for staff login credentials
-staff_credentials = {"kai": "kai", "shai": "shai", "iza": "iza"}
+# Dictionary for staff login credentials with staff IDs
+staff_credentials = {"kai": {"password": "cat", "id": "S001"}, "shai": {"password": "bird", "id": "S002"},
+                     "iza": {"password": "cow", "id": "S003"}}
 
 # Dictionary for user login credentials
-user_credentials = {"adam": "adam", "idris": "idris", "max": "max"}
+user_credentials = {"adam": "burger", "idris": "pizza", "max": "fries"}
+
+# Variable to store the role of the logged-in person
+current_role = None
 
 
 def login(role):
@@ -25,9 +29,18 @@ def login(role):
     username = input()
     password = input(f"Enter your {role} password:")
 
-    if role == "staff" and username in staff_credentials and staff_credentials[username] == password:
-        return True
+    if role == "staff":
+        staff_id = input("Enter your staff ID: ")
+        if username in staff_credentials and staff_credentials[username]["password"] == password and \
+                staff_credentials[username]["id"] == staff_id:
+            global current_role
+            current_role = "staff"
+            return True
+        else:
+            print("Invalid username, password, or staff ID")
+            return False
     elif role == "user" and username in user_credentials and user_credentials[username] == password:
+        current_role = "user"
         return True
     else:
         print("Invalid username or password")
@@ -43,7 +56,11 @@ def register(role):
             print("This username is already taken.")
             return
         password = input("Enter a password: ")
-        staff_credentials[username] = password
+        staff_id = input("Enter a unique staff ID: ")
+        if any(staff["id"] == staff_id for staff in staff_credentials.values()):
+            print("This staff ID is already taken.")
+            return
+        staff_credentials[username] = {"password": password, "id": staff_id}
         print(f"{role.capitalize()} registered successfully.")
     elif role == "user":
         if username in user_credentials:
@@ -303,3 +320,4 @@ def runAgain():
 if __name__ == "__main__":
     manageLibrary()
     runAgain()
+
